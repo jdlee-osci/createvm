@@ -1,0 +1,54 @@
+#cloud-config
+# host setup
+hostname: {{ hostvars[item]['inventory_hostname'] }}
+fqdn: {{ hostvars[item]['inventory_hostname'] }}
+prefer_fqdn_over_hostname: true
+
+# disk setup
+growpart:
+  mode: auto
+  devices: ["/"]
+  ignore_growroot_disabled: false
+
+# timezone
+timezone: {{ timezone }}
+
+# ntp
+ntp:
+  enabled: true
+  ntp_client: chrony
+  pools: []
+  servers: []
+
+# user setup
+users:
+  - default
+
+system_info:
+   default_user:
+     name: {{ default_user }}
+     ssh_authorized_keys: {{ ssh_authorized_keys }}
+     lock_passwd: false
+     groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video]
+     gecos: Cloud User
+     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+     shell: /bin/bash
+     home: /home/{{ default_user }}
+
+# resolv
+manage_resolv_conf: true
+resolv_conf:
+  nameservers:
+    - {{ dns_server }}
+
+# auth setup
+no_ssh_fingerprints: true
+disable_root: false
+ssh_pwauth: true
+chpasswd:
+  expire: false
+  list:
+    - root:{{ default_password }}
+    - cloud:{{ default_password }}
+ssh_authorized_keys: {{ ssh_authorized_keys }}
+

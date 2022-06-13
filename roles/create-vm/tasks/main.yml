@@ -1,0 +1,60 @@
+---
+- name: create vm directory
+  file:
+    path: "{{ vmdata_dir }}/{{ item }}/cloud-init"
+    state: directory
+    recurse: yes
+  with_items: "{{ groups['vms'] }}"
+
+- name: copy vm os image
+  copy:
+    src: "{{ src_vm_image_path }}"
+    dest: "{{ vmdata_dir }}/{{ item }}/os.qcow2"
+    force: yes
+  with_items: "{{ groups['vms'] }}"
+
+- name: vm os image resizing
+  command: >
+    qemu-img
+    resize 
+    {{ vmdata_dir }}/{{ item }}/os.qcow2
+    60G
+  with_items: "{{ groups['vms'] }}"
+
+- name: create meta-data
+  template:
+    src: template/meta-data.j2
+    dest: "{{ vmdata_dir }}/{{ item }}/cloud-init/meta-data"
+  with_items: "{{ groups['vms'] }}"
+
+- name: create user-data
+  template:
+    src: template/user-data.j2
+    dest: "{{ vmdata_dir }}/{{ item }}/cloud-init/user-data"
+  with_items: "{{ groups['vms'] }}"
+
+- name: create network-config
+  template:
+    src: template/network-config.j2
+    dest: "{{ vmdata_dir }}/{{ item }}/cloud-init/network-config"
+  with_items: "{{ groups['vms'] }}"
+
+- name: libvirt vm install
+  command: >
+    virt-install
+    --name {{ item }}
+    --virt-type kvm
+    --os-variant ubuntu22.04
+    --cpu host-passthrough
+    --vcpus {{ hostvars[item]['vcpu'] }}
+    --memory {{ hostvars[item]['memory'] }}
+    --graphics none
+    --noautoconsole
+    --autostart
+    --import
+    --cloud-init user-data={{ vmdata_dir }}/{{ item }}/cloud-init/user-data,meta-data=/{{ vmdata_dir }}/{{ item }}/cloud-init/meta-data,network-config={{ vmdata_dir }}/{{ item }}/cloud-init/network-config
+    --disk path={{ vmdata_dir }}/{{ item }}/os.qcow2,device=disk,bus=virtio,format=qcow2 {{ hostvars[item]['extra_disk_args'] }}
+    --network network={{ default_libvirt_network }},model=virtio {{ hostvars[item]['extra_network_args'] }}
+  with_items: "{{ groups['vms'] }}"
+
+

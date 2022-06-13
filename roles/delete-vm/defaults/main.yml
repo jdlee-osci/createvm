@@ -1,0 +1,5 @@
+---
+# dest vm config
+# vm data dir
+vmdata_dir: /data/vms
+

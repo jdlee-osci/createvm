@@ -1,0 +1,12 @@
+# network
+version: 2
+ethernets:
+  id0:
+    match:
+      name: enp1*
+    dhcp4: false
+    dhcp6: false
+    addresses:
+      - {{ hostvars[item]['ansible_host'] }}/{{ default_subnet_bit }}
+    gateway4: {{ default_gateway }}
+

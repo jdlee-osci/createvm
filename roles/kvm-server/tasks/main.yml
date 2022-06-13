@@ -1,0 +1,38 @@
+---
+- name: create ssh client config directory
+  file:
+    path: ${HOME}/.ssh
+    state: directory
+    recurse: yes
+
+- name: create ssh client config file
+  file:
+    path: ${HOME}/.ssh/config
+    state: touch
+  register: config_exist
+
+- name: replace ssh client config
+  replace:
+    path: ${HOME}/.ssh/config
+    regexp: '^Host *[\s\S]*^[\s].*'
+    replace: |+
+      Host *
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+
+      # replaced by ansible playbook
+  register: ssh_config
+  when: config_exist.changed
+
+- name: create ssh client config
+  lineinfile:
+    dest: ${HOME}/.ssh/config
+    line: |+
+      Host *
+        StrictHostKeyChecking no
+        UserKnownHostsFile /dev/null
+
+      # created by ansible playbook
+    state: present
+  when: not ssh_config.changed
+

@@ -1,0 +1,42 @@
+---
+# src vm image
+src_vm_image_path: /data/iso/ubuntu-22.04-server-cloudimg-amd64-disk-kvm.img
+src_vm_type: qcow2
+
+# dest vm config
+vcpu: 16
+memory: 32768
+
+# vm data dir
+vmdata_dir: /data/vms
+
+# dest image size
+image_size: 60G
+
+# extra disk config
+extra_disk_args:
+
+# timezone
+timezone: Asia/Seoul
+
+# dns server ip
+dns_server: 8.8.8.8
+
+# default user id
+default_user: cloud
+# root & default password
+default_password: cloud2022!
+
+# network config
+default_libvirt_network: bridged-network
+# default ip
+# ip / subnet bit
+default_ip: "{{ ansible_host }}/16"
+default_gateway: 192.168.0.1
+
+# extra network config
+extra_network_args:
+
+# ssh key array
+ssh_authorized_keys: []
+

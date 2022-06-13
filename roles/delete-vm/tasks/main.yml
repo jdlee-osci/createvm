@@ -1,0 +1,27 @@
+---
+- name: libvirt vm destroy
+  command: >
+    virsh
+    destroy
+    {{ item }}
+  with_items: "{{ groups['vms'] }}"
+  when: nodeletevm is not defined or nodeletevm != "yes"
+  ignore_errors: yes
+
+- name: libvirt vm undefine
+  command: >
+    virsh
+    undefine
+    {{ item }}
+  with_items: "{{ groups['vms'] }}"
+  when: nodeletevm is not defined or nodeletevm != "yes"
+  ignore_errors: yes
+
+- name: delete vm directory
+  file:
+    path: "{{ vmdata_dir }}/{{ item }}"
+    state: absent
+  with_items: "{{ groups['vms'] }}"
+  when: nodeletevm is not defined or nodeletevm != "yes"
+  ignore_errors: yes
+

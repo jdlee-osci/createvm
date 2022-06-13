@@ -1,0 +1,25 @@
+---
+- name: KVM server setup
+  hosts: kvm_server
+  gather_facts: false
+  roles:
+    - { role: kvm-server }
+  tags:
+    - kvm-server
+
+- name: Delete old VM
+  hosts: kvm_server
+  gather_facts: false
+  roles:
+    - { role: delete-vm }
+  tags:
+    - delete-vm
+
+- name: Create VM
+  hosts: kvm_server
+  gather_facts: false
+  roles:
+    - { role: create-vm }
+  tags:
+    - create-vm
+
