@@ -1,0 +1,31 @@
+---
+- name: Create cloud image download directory
+  file:
+    path: "{{ download_path }}"
+    state: directory
+    recurse: yes
+
+- name: Check Rocky image exists
+  stat:
+    path: "{{ download_path }}/{{ download_url.rocky | basename }}"
+  register: rocky_stat
+
+- name: Check Ubuntu image exists
+  stat:
+    path: "{{ download_path }}/{{ download_url.ubuntu | basename }}"
+  register: ubuntu_stat
+
+- name: Download Rocky cloud images
+  get_url:
+    url: "{{ download_url.rocky }}"
+    dest: "{{ download_path }}/{{ download_url.rocky | basename }}"
+    force: yes
+  when: not rocky_stat.stat.exists
+
+- name: Download Ubuntu cloud images
+  get_url:
+    url: "{{ download_url.ubuntu }}"
+    dest: "{{ download_path }}/{{ download_url.ubuntu | basename }}"
+    force: yes
+  when: not ubuntu_stat.stat.exists
+

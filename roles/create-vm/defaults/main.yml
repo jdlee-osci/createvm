@@ -1,7 +1,6 @@
 ---
-# src vm image
-src_vm_image_path: /data/iso/ubuntu-22.04-server-cloudimg-amd64-disk-kvm.img
-src_vm_type: qcow2
+# src vm image type
+src_vm_image_type: ubuntu
 
 # dest vm config
 vcpu: 16

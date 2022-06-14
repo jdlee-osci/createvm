@@ -1,0 +1,8 @@
+# download src url
+download_url:
+  ubuntu: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img
+  rocky: http://dl.rockylinux.org/vault/rocky/8.5/images/Rocky-8-GenericCloud-8.5-20211114.2.x86_64.qcow2
+
+# download base path
+download_path: /data/iso
+

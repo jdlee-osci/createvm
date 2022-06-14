@@ -1,9 +1,9 @@
 [all]
 kvm_server ansible_host=127.0.0.1 ansible_connection=local
-controller01 ansible_host=192.168.123.11 extra_network_args="--network type=direct,source=eno1,source.mode=passthrough,model=virtio --network type=direct,source=eno2,source.mode=passthrough,model=virtio"
-controller02 ansible_host=192.168.123.12 vcpu=4 memory=16384
+deploy ansible_host=192.168.123.10 vcpu=4 memory=8192 image_size=250G extra_network_args="--network network=ceph-pub-network,model=virtio"
+controller01 ansible_host=192.168.123.11 vcpu=8 memory=16384 extra_network_args="--network network=ceph-pub-network,model=virtio --network network=ceph-repl-network,model=virtio"
 
 [vms]
+deploy
 controller01
-controller02
 

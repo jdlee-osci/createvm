@@ -8,7 +8,7 @@
 
 - name: copy vm os image
   copy:
-    src: "{{ src_vm_image_path }}"
+    src: "{{ download_path }}/{{ download_url[hostvars[item]['src_vm_image_type']] | basename }}"
     dest: "{{ vmdata_dir }}/{{ item }}/os.qcow2"
     force: yes
   with_items: "{{ groups['vms'] }}"
@@ -18,7 +18,7 @@
     qemu-img
     resize 
     {{ vmdata_dir }}/{{ item }}/os.qcow2
-    60G
+    {{ hostvars[item]['image_size'] }}
   with_items: "{{ groups['vms'] }}"
 
 - name: create meta-data
@@ -39,22 +39,33 @@
     dest: "{{ vmdata_dir }}/{{ item }}/cloud-init/network-config"
   with_items: "{{ groups['vms'] }}"
 
+- name: Create cidata iso image
+  command: >
+    genisoimage
+    -output {{ vmdata_dir }}/{{ item }}/cloud-init/cidata.iso
+    -volid cidata -J -r
+    {{ vmdata_dir }}/{{ item }}/cloud-init/user-data
+    {{ vmdata_dir }}/{{ item }}/cloud-init/meta-data
+    {{ vmdata_dir }}/{{ item }}/cloud-init/network-config
+  with_items: "{{ groups['vms'] }}"
+
 - name: libvirt vm install
   command: >
     virt-install
     --name {{ item }}
     --virt-type kvm
-    --os-variant ubuntu22.04
-    --cpu host-passthrough
+    --os-variant unknown
+    --cpu {{ hostvars[item]['cpu_model'] | default('host-passthrough') }}
     --vcpus {{ hostvars[item]['vcpu'] }}
     --memory {{ hostvars[item]['memory'] }}
     --graphics none
     --noautoconsole
     --autostart
     --import
-    --cloud-init user-data={{ vmdata_dir }}/{{ item }}/cloud-init/user-data,meta-data=/{{ vmdata_dir }}/{{ item }}/cloud-init/meta-data,network-config={{ vmdata_dir }}/{{ item }}/cloud-init/network-config
+    --disk path={{ vmdata_dir }}/{{ item }}/cloud-init/cidata.iso,device=cdrom
     --disk path={{ vmdata_dir }}/{{ item }}/os.qcow2,device=disk,bus=virtio,format=qcow2 {{ hostvars[item]['extra_disk_args'] }}
     --network network={{ default_libvirt_network }},model=virtio {{ hostvars[item]['extra_network_args'] }}
+#    --cloud-init user-data={{ vmdata_dir }}/{{ item }}/cloud-init/user-data,meta-data=/{{ vmdata_dir }}/{{ item }}/cloud-init/meta-data,network-config={{ vmdata_dir }}/{{ item }}/cloud-init/network-config
   with_items: "{{ groups['vms'] }}"
 
 

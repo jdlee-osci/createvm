@@ -1,12 +1,37 @@
 # network
 version: 2
 ethernets:
-  id0:
+  eth0:
     match:
-      name: enp1*
+      name: ens2
     dhcp4: false
     dhcp6: false
     addresses:
       - {{ hostvars[item]['ansible_host'] }}/{{ default_subnet_bit }}
     gateway4: {{ default_gateway }}
+
+  eth1:
+    match:
+      name: ens3
+    dhcp4: false
+    dhcp6: false
+
+  eth2:
+    match:
+      name: ens4
+    dhcp4: false
+    dhcp6: false
+
+  eth3:
+    match:
+      name: ens5
+    dhcp4: false
+    dhcp6: false
+
+  eth4:
+    match:
+      name: ens6
+    dhcp4: false
+    dhcp6: false
+
 

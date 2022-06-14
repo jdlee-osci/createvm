@@ -1,17 +1,35 @@
 ---
-- name: create ssh client config directory
+- name: Create ssh client config directory
   file:
     path: ${HOME}/.ssh
     state: directory
     recurse: yes
 
-- name: create ssh client config file
+- name: Create ssh key
+  openssh_keypair:
+    path: ${HOME}/.ssh/id_rsa
+    type: rsa
+    size: 2048
+
+- name: Get ssh pub key
+  command: cat ${HOME}/.ssh/id_rsa.pub
+  register: pubkey
+
+- name: Auth init
+  set_fact:
+    ssh_authorized_keys: "{{ ssh_authorized_keys | default([]) }}"
+
+- name: Auth add
+  set_fact:
+    ssh_authorized_keys: "{{ ssh_authorized_keys | list + pubkey.stdout_lines | list }}"
+
+- name: Create ssh client config file
   file:
     path: ${HOME}/.ssh/config
     state: touch
   register: config_exist
 
-- name: replace ssh client config
+- name: Replace ssh client config
   replace:
     path: ${HOME}/.ssh/config
     regexp: '^Host *[\s\S]*^[\s].*'
@@ -24,7 +42,7 @@
   register: ssh_config
   when: config_exist.changed
 
-- name: create ssh client config
+- name: Create ssh client config
   lineinfile:
     dest: ${HOME}/.ssh/config
     line: |+
