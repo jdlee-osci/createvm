@@ -1,0 +1,3 @@
+ansible-hosts
+group_vars/all.yml
+venv*

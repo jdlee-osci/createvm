@@ -1,0 +1,60 @@
+---
+# download src url
+download_url:
+  ubuntu: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img
+  ubuntu-focal: https://cloud-images.ubuntu.com/focal/20230719/focal-server-cloudimg-amd64-disk-kvm.img
+  ubuntu-jammy: https://cloud-images.ubuntu.com/jammy/20230719/jammy-server-cloudimg-amd64-disk-kvm.img
+  rocky: https://download.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud.latest.x86_64.qcow2
+  rocky8: https://download.rockylinux.org/pub/rocky/8.8/images/x86_64/Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2
+  rocky9: https://download.rockylinux.org/pub/rocky/9.2/images/x86_64/Rocky-9-GenericCloud-Base-9.2-20230513.0.x86_64.qcow2
+
+
+# download base path
+download_path: /data/iso
+
+# src vm image type
+src_vm_image_type: rocky9
+
+# dest vm config
+vcpu: 16
+memory: 32768
+
+# vm data dir
+vmdata_dir: /data/vm
+
+# dest image size
+image_size: 60G
+
+# extra disk config
+# example
+# extra_disk:
+#   - size: 60G
+#   - size: 40G
+extra_disk: []
+
+# timezone
+timezone: Asia/Seoul
+
+# dns server ip
+dns_server: 8.8.8.8
+
+# default user id
+default_user: cloud
+# root & default password
+default_password: cloud2022!
+
+# network config
+default_libvirt_network: default
+default_gateway: 192.168.122.1
+default_subnet_bit: 24
+default_ip: "{{ ansible_host }}/{{ default_subnet_bit }}"
+
+# os variant
+os-variant: generic
+
+# extra network config
+extra_network_args:
+
+# ssh key array
+ssh_authorized_keys: []
+

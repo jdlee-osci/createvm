@@ -21,6 +21,42 @@
     {{ hostvars[item]['image_size'] }}
   with_items: "{{ groups['vms'] }}"
 
+
+- name: extra disk create | create list
+  set_fact:
+    extra_disk_host: "{{ extra_disk_host | default([]) + ( [ {'hostname': item} ] * hostvars[item]['extra_disk'] | length ) }}"
+    extra_disk_size: "{{ extra_disk_size | default([]) + hostvars[item]['extra_disk'] }}"
+  with_items: "{{ groups['vms'] }}"
+  when: hostvars[item]['extra_disk'] | length > 0
+
+- name: extra disk create | merge list
+  set_fact:
+    extra_disk_list: "{{ extra_disk_list | default([]) + [ item[0] | combine(item[1]) ] }}"
+  loop: "{{ extra_disk_host | zip(extra_disk_size) | list }}"
+  when: extra_disk_host is defined and extra_disk_host | length > 0
+
+- name: extra disk create
+  command: >
+    qemu-img
+    create
+    -f qcow2
+    {{ vmdata_dir }}/{{ item.hostname }}/disk-{{ disk_idx }}.qcow2
+    {{ item.size }}
+  with_items: "{{ extra_disk_list }}"
+  when: extra_disk_list is defined and extra_disk_list | length > 0
+  loop_control:
+    index_var: disk_idx
+
+- name: extra disk argument string create
+  vars:
+    host_extra_disk_args: {}
+  set_fact:
+    host_extra_disk_args: "{{ host_extra_disk_args | combine({ item.hostname: host_extra_disk_args[item.hostname] | default('') + ' --disk ' + vmdata_dir + '/' + item.hostname + '/disk-' + disk_idx | string + '.qcow2,device=disk,bus=virtio,format=qcow2' }) }}"
+  with_items: "{{ extra_disk_list }}"
+  when: extra_disk_list is defined and extra_disk_list | length > 0
+  loop_control:
+    index_var: disk_idx
+
 - name: create meta-data
   template:
     src: template/meta-data.j2
@@ -54,7 +90,7 @@
     virt-install
     --name {{ item }}
     --virt-type kvm
-    --os-variant unknown
+    --os-variant {{ hostvars[item]['os-variant'] }}
     --cpu {{ hostvars[item]['cpu_model'] | default('host-passthrough') }}
     --vcpus {{ hostvars[item]['vcpu'] }}
     --memory {{ hostvars[item]['memory'] }}
@@ -63,9 +99,8 @@
     --autostart
     --import
     --disk path={{ vmdata_dir }}/{{ item }}/cloud-init/cidata.iso,device=cdrom
-    --disk path={{ vmdata_dir }}/{{ item }}/os.qcow2,device=disk,bus=virtio,format=qcow2 {{ hostvars[item]['extra_disk_args'] }}
-    --network network={{ default_libvirt_network }},model=virtio {{ hostvars[item]['extra_network_args'] }}
-#    --cloud-init user-data={{ vmdata_dir }}/{{ item }}/cloud-init/user-data,meta-data=/{{ vmdata_dir }}/{{ item }}/cloud-init/meta-data,network-config={{ vmdata_dir }}/{{ item }}/cloud-init/network-config
+    --disk path={{ vmdata_dir }}/{{ item }}/os.qcow2,device=disk,bus=virtio,format=qcow2 {{ host_extra_disk_args[item] | default("") }}
+    --network network={{ hostvars[item]['default_libvirt_network'] }},model=virtio {{ hostvars[item]['extra_network_args'] }}
   with_items: "{{ groups['vms'] }}"
 
 

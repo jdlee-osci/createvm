@@ -15,13 +15,9 @@
   command: cat ${HOME}/.ssh/id_rsa.pub
   register: pubkey
 
-- name: Auth init
-  set_fact:
-    ssh_authorized_keys: "{{ ssh_authorized_keys | default([]) }}"
-
 - name: Auth add
   set_fact:
-    ssh_authorized_keys: "{{ ssh_authorized_keys | list + pubkey.stdout_lines | list }}"
+    ssh_authorized_keys: "{{ ssh_authorized_keys | default([]) + pubkey.stdout_lines | list }}"
 
 - name: Create ssh client config file
   file:

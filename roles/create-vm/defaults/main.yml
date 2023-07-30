@@ -1,10 +1,16 @@
 ---
 # src vm image type
-src_vm_image_type: ubuntu
+src_vm_image_type: ubuntu-jammy
 
 # dest vm config
 vcpu: 16
 memory: 32768
+
+# dest os variant
+os-variant: generic
+
+# dest cpu model
+cpu_model: host-passthrough
 
 # vm data dir
 vmdata_dir: /data/vms
@@ -13,7 +19,11 @@ vmdata_dir: /data/vms
 image_size: 60G
 
 # extra disk config
-extra_disk_args:
+# example
+# extra_disk:
+#   - size: 60G
+#   - size: 40G
+extra_disk: []
 
 # timezone
 timezone: Asia/Seoul
@@ -27,14 +37,14 @@ default_user: cloud
 default_password: cloud2022!
 
 # network config
-default_libvirt_network: bridged-network
+default_libvirt_network: default
 # default ip
 # ip / subnet bit
 default_ip: "{{ ansible_host }}/16"
 default_gateway: 192.168.0.1
 
 # extra network config
-extra_network_args:
+extra_network_args: ""
 
 # ssh key array
 ssh_authorized_keys: []

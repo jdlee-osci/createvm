@@ -1,31 +1,20 @@
 ---
-- name: Create cloud image download directory
+- name: Create image download directory
   file:
     path: "{{ download_path }}"
     state: directory
     recurse: yes
 
-- name: Check Rocky image exists
+- name: Check image exists
   stat:
-    path: "{{ download_path }}/{{ download_url.rocky | basename }}"
-  register: rocky_stat
+    path: "{{ download_path }}/{{ item.value | basename }}"
+  register: image_stat
+  with_dict: "{{ download_url }}"
 
-- name: Check Ubuntu image exists
-  stat:
-    path: "{{ download_path }}/{{ download_url.ubuntu | basename }}"
-  register: ubuntu_stat
-
-- name: Download Rocky cloud images
+- name: Download images
   get_url:
-    url: "{{ download_url.rocky }}"
-    dest: "{{ download_path }}/{{ download_url.rocky | basename }}"
-    force: yes
-  when: not rocky_stat.stat.exists
-
-- name: Download Ubuntu cloud images
-  get_url:
-    url: "{{ download_url.ubuntu }}"
-    dest: "{{ download_path }}/{{ download_url.ubuntu | basename }}"
-    force: yes
-  when: not ubuntu_stat.stat.exists
+    url: "{{ download_url[item.key] }}"
+    dest: "{{ download_path }}/{{ download_url[item.key] | basename }}"
+  with_dict: "{{ download_url }}"
+  when: not (image_stat.results | selectattr('item.key', 'eq', item.key) | map(attribute='stat.exists') | join('') | bool)
 
