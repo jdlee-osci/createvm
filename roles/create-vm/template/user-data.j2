@@ -23,17 +23,23 @@ ntp:
 # user setup
 users:
   - default
+  - name: root
+    lock_passwd: false
+    passwd: {{ default_password }}
+    hashed_passwd: {{ default_password }}
 
 system_info:
-   default_user:
-     name: {{ default_user }}
-     ssh_authorized_keys: {{ ssh_authorized_keys }}
-     lock_passwd: false
-     groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video]
-     gecos: Cloud User
-     sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-     shell: /bin/bash
-     home: /home/{{ default_user }}
+  default_user:
+    name: {{ default_user }}
+    ssh_authorized_keys: {{ ssh_authorized_keys }}
+    lock_passwd: false
+    passwd: {{ default_password }}
+    hashed_passwd: {{ default_password }}
+    groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video]
+    gecos: Cloud User
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    shell: /bin/bash
+    home: /home/{{ default_user }}
 
 # resolv
 manage_resolv_conf: true
@@ -45,10 +51,10 @@ resolv_conf:
 no_ssh_fingerprints: true
 disable_root: false
 ssh_pwauth: true
-chpasswd:
-  expire: false
-  list:
-    - root:{{ default_password }}
-    - cloud:{{ default_password }}
 ssh_authorized_keys: {{ ssh_authorized_keys }}
+
+# resolv.conf, sshd_config change
+bootcmd:
+  - echo nameserver {{ dns_server }} > /etc/resolv.conf
+  - sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/g' /etc/ssh/sshd_config
 

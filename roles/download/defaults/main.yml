@@ -6,7 +6,11 @@ download_url:
   rocky: "https://download.rockylinux.org/pub/rocky/8/images/x86_64/Rocky-8-GenericCloud.latest.x86_64.qcow2"
   rocky8: "https://download.rockylinux.org/pub/rocky/8.8/images/x86_64/Rocky-8-GenericCloud-Base-8.8-20230518.0.x86_64.qcow2"
   rocky9: "https://download.rockylinux.org/pub/rocky/9.2/images/x86_64/Rocky-9-GenericCloud-Base-9.2-20230513.0.x86_64.qcow2"
+  centos7: https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-2003.qcow2
 
 # download base path
 download_path: /data/iso
+
+# download skip
+skip_download: false
 

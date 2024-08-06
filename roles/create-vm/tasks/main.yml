@@ -21,7 +21,6 @@
     {{ hostvars[item]['image_size'] }}
   with_items: "{{ groups['vms'] }}"
 
-
 - name: extra disk create | create list
   set_fact:
     extra_disk_host: "{{ extra_disk_host | default([]) + ( [ {'hostname': item} ] * hostvars[item]['extra_disk'] | length ) }}"
@@ -94,7 +93,7 @@
     --cpu {{ hostvars[item]['cpu_model'] | default('host-passthrough') }}
     --vcpus {{ hostvars[item]['vcpu'] }}
     --memory {{ hostvars[item]['memory'] }}
-    --graphics none
+    --graphics spice
     --noautoconsole
     --autostart
     --import

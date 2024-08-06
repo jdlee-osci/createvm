@@ -4,34 +4,11 @@ ethernets:
   eth0:
     match:
       name: ens3
+{% if src_vm_image_type != 'centos7' %}
     dhcp4: false
     dhcp6: false
+{% endif %}
     addresses:
       - {{ hostvars[item]['ansible_host'] }}/{{ hostvars[item]['default_subnet_bit'] }}
     gateway4: {{ hostvars[item]['default_gateway'] }}
-
-  eth1:
-    match:
-      name: ens4
-    dhcp4: false
-    dhcp6: false
-
-  eth2:
-    match:
-      name: ens5
-    dhcp4: false
-    dhcp6: false
-
-  eth3:
-    match:
-      name: ens6
-    dhcp4: false
-    dhcp6: false
-
-  eth4:
-    match:
-      name: ens7
-    dhcp4: false
-    dhcp6: false
-
 

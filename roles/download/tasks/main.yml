@@ -16,5 +16,7 @@
     url: "{{ download_url[item.key] }}"
     dest: "{{ download_path }}/{{ download_url[item.key] | basename }}"
   with_dict: "{{ download_url }}"
-  when: not (image_stat.results | selectattr('item.key', 'eq', item.key) | map(attribute='stat.exists') | join('') | bool)
+  when:
+    - not (image_stat.results | selectattr('item.key', 'eq', item.key) | map(attribute='stat.exists') | join('') | bool)
+    - not skip_download
 
