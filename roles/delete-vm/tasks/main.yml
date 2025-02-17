@@ -12,6 +12,7 @@
   command: >
     virsh
     undefine
+    --nvram
     {{ item }}
   with_items: "{{ groups['vms'] }}"
   when: nodeletevm is not defined or nodeletevm != "yes"

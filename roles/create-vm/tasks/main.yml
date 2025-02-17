@@ -90,6 +90,7 @@
     --name {{ item }}
     --virt-type kvm
     --os-variant {{ hostvars[item]['os-variant'] }}
+    --boot bootmenu.enable=on
     --cpu {{ hostvars[item]['cpu_model'] | default('host-passthrough') }}
     --vcpus {{ hostvars[item]['vcpu'] }}
     --memory {{ hostvars[item]['memory'] }}
