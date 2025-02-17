@@ -12,6 +12,9 @@ download_url:
 # download base path
 download_path: /data/iso
 
+# skip download
+skip_download: true
+
 # src vm image type
 src_vm_image_type: rocky9
 
@@ -53,6 +56,7 @@ default_ip: "{{ ansible_host }}/{{ default_subnet_bit }}"
 os-variant: generic
 
 # extra network config
+# extra_network_args: "--network network=bridged-network,model=virtio"
 extra_network_args:
 
 # ssh key array
